@@ -12,8 +12,6 @@ load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 TWITCH_TOKEN = os.getenv("TWITCH_TOKEN")
-CHANNEL_NAME = os.getenv("CHANNEL_NAME")
-
 
 
 client = OpenAI(api_key=OPENAI_API_KEY)
