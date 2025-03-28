@@ -1,5 +1,4 @@
 from twitchio.ext import commands
-# import openai
 import asyncio
 import os
 import edge_tts
