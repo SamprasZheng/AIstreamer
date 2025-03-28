@@ -1,2 +1,2 @@
 # AIstreamer
-python x chatgpt x twitch
+live on https://www.twitch.tv/polkasharks
