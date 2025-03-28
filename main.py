@@ -80,6 +80,13 @@ def chat_response(user_msg):
     )
     return response.choices[0].message.content
 
+@commands.command(name="指令")
+async def show_keywords(self, ctx):
+    keyword_list = list(KEYWORD_REPLIES.keys())
+    # 可選排序
+    keyword_list.sort()
+    keywords_str = "可用關鍵字：「" + "、".join(keyword_list) + "」"
+    await ctx.send(keywords_str)
 
 
 
@@ -100,6 +107,8 @@ class Bot(commands.Bot):
     async def event_message(self, message):
         if message.echo:
             return
+        
+        await self.handle_commands(message)
 
         user = message.author.name
         content = message.content
