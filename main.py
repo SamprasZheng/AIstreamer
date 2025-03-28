@@ -7,14 +7,42 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from pydub import AudioSegment
 import winsound
+import json
+import random
+import sys
 
 load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 TWITCH_TOKEN = os.getenv("TWITCH_TOKEN")
 
+with open("D:/AItwitch/keywords.json", "r", encoding="utf-8") as f:
+    KEYWORD_REPLIES = json.load(f)
+
 
 client = OpenAI(api_key=OPENAI_API_KEY)
+
+# KEYWORD_REPLIES = {
+#     "nft": "NFT 只是數位收藏？才不止如此呢～",
+#     "比特幣": "比特幣，還是鏈上海洋中的旗艦級存在啊。",
+#     "bitcoin": "比特幣，還是鏈上海洋中的旗艦級存在啊。",
+#     "以太坊": "以太坊就像是這片海中的魔法發動器！",
+#     "ethereum": "以太坊就像是這片海中的魔法發動器！",
+#     "帥": "哼，我當然是最帥的加密鯊啦～",
+#     "gm": "gm gm，早安啊冒險者 🐬"
+# }
+
+async def check_keywords_and_reply(message):
+    content = message.content.lower()
+
+    for keyword, replies in KEYWORD_REPLIES.items():
+        if keyword in content:
+            reply = random.choice(replies)
+            await message.channel.send(reply) 
+            await speak(reply)                
+            return True
+    return False
+
 
 
 
@@ -52,6 +80,9 @@ def chat_response(user_msg):
     )
     return response.choices[0].message.content
 
+
+
+
 # 📡 Twitch Bot
 class Bot(commands.Bot):
 
@@ -65,6 +96,7 @@ class Bot(commands.Bot):
     async def event_ready(self):
         print(f'✅ 已登入：{self.nick}')
 
+
     async def event_message(self, message):
         if message.echo:
             return
@@ -73,10 +105,16 @@ class Bot(commands.Bot):
         content = message.content
         print(f"{user}: {content}")
 
+        hit = await check_keywords_and_reply(message)
+        if hit:
+            return  # 命中關鍵字就不用再呼叫 GPT
+
+        # GPT 回應流程
         reply = chat_response(content)
         print(f"polkasharks: {reply}")
+        await message.channel.send(reply)
+        await speak(reply)
 
-        await speak(reply)  # 播放語音
 
 bot = Bot()
 bot.run()
